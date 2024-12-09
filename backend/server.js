@@ -20,8 +20,11 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(cors());
-
+app.use(cors({
+  origin: ["http://localhost:5173", "https://journalz.onrender.com","https://journalifyz.netlify.app"], // Allow specific origins
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allow specific HTTP methods
+  credentials: true, // Allow credentials like cookies
+}));
 // Request logging middleware
 app.use((req, res, next) => {
   logger.info(`Incoming request: ${req.method} ${req.url}`);
@@ -33,6 +36,24 @@ app.use("/api/users", userRoutes);
 
 // Apply middleware to protect below routes
 // app.use(authenticateToken);
+
+// Default health check route
+app.get("/", (req, res) => {
+  res.status(200).json({
+      status: "success",
+      message: "Server is running smoothly!",
+      timestamp: new Date(),
+  });
+});
+
+// Optionally, add another route for detailed health checks
+app.get("/health", (req, res) => {
+  res.status(200).json({
+      status: "success",
+      databaseConnected: mongoose.connection.readyState === 1, // Check MongoDB connection
+      timestamp: new Date(),
+  });
+});
 
 // Protected routes
 app.use("/api/journals", journalRoutes);
