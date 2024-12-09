@@ -12,6 +12,7 @@ import MyJournals from "./pages/MyJournals";
 import Dashboard from "./pages/Dashboard";
 import CreateJournal from "./pages/CreateJournal";
 import EditJournal from "./pages/EditJournal";
+import DetailedJournal from "./pages/DetailedJournal";
 
 const App = () => {
 
@@ -33,6 +34,7 @@ const App = () => {
           />
         <Route path="/public-journals" element={<PublicJournals />} />
         <Route path="/my-journals" element={<MyJournals />} />
+        <Route path="/journal/:id" element={<DetailedJournal />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/create-journal" element={<CreateJournal />} />
         <Route path="/edit-journal/:id" element={<EditJournal />} />
