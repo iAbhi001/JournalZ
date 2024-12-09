@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -9,18 +9,37 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
+import API from "../api/axios"; // Import the reusable Axios instance
 
 const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false); // Simulated loading state
-  const [saving, setSaving] = useState(false); // Simulated saving state
+  const [loading, setLoading] = useState(true); // Initial loading state
+  const [saving, setSaving] = useState(false); // Saving state for updates
   const [userDetails, setUserDetails] = useState({
     avatar: "",
-    name: "John Doe",
-    email: "john.doe@example.com",
-    bio: "This is a sample bio.",
+    name: "",
+    email: "",
+    bio: "",
   });
+
   const [error, setError] = useState("");
+
+  // Fetch user profile from the backend
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await API.get("/users/profile"); // Adjust endpoint if necessary
+        setUserDetails(response.data); // Assuming the backend sends `avatar`, `name`, `email`, and `bio`
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load user profile. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleEditToggle = () => {
     setIsEditing((prev) => !prev);
@@ -32,15 +51,23 @@ const Profile = () => {
     setUserDetails((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setSaving(true);
     setError("");
-
-    // Simulate saving data with a timeout
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      const response = await API.put("/users/profile", {
+        name: userDetails.name,
+        avatar: userDetails.avatar,
+        bio: userDetails.bio,
+      }); // Backend accepts these fields for update
+      setUserDetails(response.data); // Update with latest data from server
       setIsEditing(false);
-    }, 2000);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save changes. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (

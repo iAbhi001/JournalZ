@@ -1,16 +1,22 @@
 import React, { useState } from "react";
-import { Box, TextField, Button } from "@mui/material";
+import { Box, TextField, Button, Typography } from "@mui/material";
+import API from "../api/axios";
 
 const EditComment = ({ comment, onSave }) => {
   const [content, setContent] = useState(comment.content);
   const [loading, setLoading] = useState(false);
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     setLoading(true);
-    setTimeout(() => {
-      onSave({ ...comment, content: `${content} (Edited)` }); // Simulate update
+    try {
+      const { data } = await API.patch(`/journals/${comment._id}`, { content });
+      onSave(data); // Update the comment in the parent component
+    } catch (error) {
+      console.error("Error editing comment:", error);
+      alert("Failed to edit comment.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
@@ -20,7 +26,6 @@ const EditComment = ({ comment, onSave }) => {
         onChange={(e) => setContent(e.target.value)}
         fullWidth
         multiline
-        sx={{ marginBottom: 2 }}
       />
       <Button
         onClick={handleEdit}

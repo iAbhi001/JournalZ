@@ -12,6 +12,7 @@ import {
   Chip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axios"; // Axios instance for API calls
 
 const CreateJournal = () => {
   const navigate = useNavigate();
@@ -21,10 +22,10 @@ const CreateJournal = () => {
     category: "",
     content: "",
     image: "",
-    tags: [],
+    tags: [], // Initialize tags as an empty array
   });
 
-  const [tagInput, setTagInput] = useState("");
+  const [tagInput, setTagInput] = useState(""); // For adding tags dynamically
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ const CreateJournal = () => {
 
   const handleTagAdd = (e) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
-      e.preventDefault();
+      e.preventDefault(); // Prevent form submission
       if (!journalData.tags.includes(tagInput.trim())) {
         setJournalData({ ...journalData, tags: [...journalData.tags, tagInput.trim()] });
       }
@@ -51,23 +52,19 @@ const CreateJournal = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError("");
     setSuccess("");
     setLoading(true);
-
-    setTimeout(() => {
-      if (!journalData.title || !journalData.content) {
-        setError("Title and Content are required.");
-        setLoading(false);
-        return;
-      }
-
+    try {
+      await API.post("/journals", journalData); // Make API call to create the journal
       setSuccess("Journal created successfully!");
+      setTimeout(() => navigate("/my-journals"), 2000); // Redirect after 2 seconds
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create journal.");
+    } finally {
       setLoading(false);
-
-      setTimeout(() => navigate("/my-journals"), 2000); // Simulate redirect after creation
-    }, 1000);
+    }
   };
 
   return (

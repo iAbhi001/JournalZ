@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axios"; // Axios instance for API calls
 
 const months = [
   { value: "01", label: "January" },
@@ -41,32 +42,46 @@ const years = Array.from(
 const PublicJournals = () => {
   const navigate = useNavigate();
   const [journals, setJournals] = useState([]);
-  const [tags, setTags] = useState(["Inspiration", "Travel", "Life"]);
+  const [tags, setTags] = useState([]);
   const [selectedTag, setSelectedTag] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(3); // Simulated total pages
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const journalsPerPage = 6;
 
-  // Simulate journal data
-  useEffect(() => {
+  // Fetch public journals with pagination and filters
+  const fetchPublicJournals = async (currentPage = 1) => {
     setLoading(true);
     setError("");
+    try {
+      const { data } = await API.get("/journals/public", {
+        params: {
+          page: currentPage,
+          limit: journalsPerPage,
+          tag: selectedTag,
+          month: selectedMonth,
+          year: selectedYear,
+        },
+      });
+      setJournals(data.journals);
+      setTotalPages(data.totalPages);
 
-    setTimeout(() => {
-      const sampleJournals = Array.from({ length: journalsPerPage }, (_, i) => ({
-        _id: i + (page - 1) * journalsPerPage,
-        title: `Journal Title ${i + 1}`,
-        tags: ["Inspiration", "Travel"],
-        image: "https://via.placeholder.com/150",
-      }));
-      setJournals(sampleJournals);
+      // Extract unique tags from journals
+      const allTags = data.journals.flatMap((journal) => journal.tags || []);
+      setTags([...new Set(allTags)]);
+    } catch (err) {
+      setError("Failed to load public journals. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    fetchPublicJournals(page);
   }, [page, selectedTag, selectedMonth, selectedYear]);
 
   const handleTagClick = (tag) => {
@@ -197,14 +212,9 @@ const PublicJournals = () => {
       ) : (
         <Grid container spacing={4}>
           {journals.map((journal) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              key={journal._id}
-              onClick={() => navigate(`/journal/${journal._id}`)}
-              style={{ cursor: "pointer" }}
+            <Grid item xs={12} sm={6} md={4} key={journal._id}
+            onClick={() => navigate(`/journal/${journal._id}`)} 
+            style={{ cursor: "pointer" }}
             >
               <Card
                 sx={{
@@ -218,7 +228,7 @@ const PublicJournals = () => {
               >
                 <Box
                   sx={{
-                    backgroundImage: `url(${journal.image})`,
+                    backgroundImage: `url(${journal.image || "https://via.placeholder.com/150"})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     height: 150,
