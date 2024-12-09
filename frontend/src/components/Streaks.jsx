@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import { Box, Typography, CircularProgress, Alert } from "@mui/material";
+import API from "../api/axios";
 
 const Streaks = () => {
   const [activityDates, setActivityDates] = useState([]);
@@ -10,25 +11,20 @@ const Streaks = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Simulate fetching streak data
-    setLoading(true);
-    setError("");
-    setTimeout(() => {
-      const simulatedData = {
-        activityDates: [
-          "2024-12-01",
-          "2024-12-02",
-          "2024-12-03",
-          "2024-12-05",
-          "2024-12-07",
-        ],
-        streak: 3, // Simulated current streak
-      };
+    const fetchStreakData = async () => {
+      try {
+        const { data } = await API.get("/users/streak");
+        setActivityDates(data.activityDates);
+        // console.log(data)
+        setStreak(data.streak);
+      } catch (err) {
+        setError("Failed to load streak data.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setActivityDates(simulatedData.activityDates);
-      setStreak(simulatedData.streak);
-      setLoading(false);
-    }, 1000);
+    fetchStreakData();
   }, []);
 
   const transformData = () => {

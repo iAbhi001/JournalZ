@@ -1,16 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, Link, Alert } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
   // Form state and error handling
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    setError("Login functionality is disabled in this UI-only version.");
-    setLoading(false);
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogin = async () => {
+    setError(""); // Reset error
+    setLoading(true); // Start loading
+    try {
+      // Perform login using AuthContext
+      await login(email, password);
+      navigate("/dashboard"); // Redirect to Dashboard on successful login
+    } catch (err) {
+      setError(err.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   return (

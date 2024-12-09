@@ -16,7 +16,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useNavigate, useParams } from "react-router-dom";
-import Comments from "../components/Comments";
+import API from "../api/axios"; // Axios instance for API calls
+import Comments from "../components/Comments"; // Import Comments component
+import Cookies from "js-cookie";
 
 const DetailedJournal = () => {
   const navigate = useNavigate();
@@ -27,31 +29,36 @@ const DetailedJournal = () => {
   const [error, setError] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
 
-  const loggedInUserId = "12345"; // Simulated logged-in user ID
+  const loggedInUserId = Cookies.get("userId"); // Get admin's ID from cookies
 
-  // Simulate fetching journal data
+  const handleVisibilityToggle = async () => {
+    const newVisibility = journalData.visibility === "private" ? "public" : "private";
+    try {
+      const { data } = await API.patch(`/journals/${id}/visibility`, { visibility: newVisibility });
+      setJournalData(data); // Update the local state
+      alert(`Journal is now ${newVisibility}.`);
+    } catch (error) {
+      alert("Failed to update visibility. Please try again.");
+    }
+  };
+
   useEffect(() => {
-    setLoading(true);
-    setTimeout(() => {
-      const simulatedData = {
-        title: "Sample Journal Title",
-        category: "Personal",
-        content: "This is the sample content of the journal.",
-        createdAt: new Date().toISOString(),
-        visibility: "public",
-        image: "https://via.placeholder.com/800x300",
-        tags: ["Sample", "React", "Journal"],
-        user: {
-          _id: loggedInUserId,
-          name: "John Doe",
-          email: "john.doe@example.com",
-          avatar: "https://via.placeholder.com/150",
-        },
-      };
-      setJournalData(simulatedData);
-      setIsPrivate(simulatedData.user._id === loggedInUserId);
-      setLoading(false);
-    }, 1000);
+    const fetchJournal = async () => {
+      try {
+        const { data } = await API.get(`/journals/${id}`);
+        setJournalData(data);
+
+        // Determine if the journal is private
+        if (data.user && data.user._id === loggedInUserId) {
+          setIsPrivate(true);
+        }
+      } catch (err) {
+        setError("Failed to fetch journal details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchJournal();
   }, [id, loggedInUserId]);
 
   const handleBack = () => {
@@ -62,17 +69,15 @@ const DetailedJournal = () => {
     navigate(`/edit-journal/${id}`);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this journal?")) {
-      alert("Journal deleted successfully.");
-      navigate("/my-journals");
+      try {
+        await API.delete(`/journals/${id}`);
+        navigate("/my-journals");
+      } catch (err) {
+        setError("Failed to delete the journal.");
+      }
     }
-  };
-
-  const handleVisibilityToggle = () => {
-    const newVisibility = journalData.visibility === "private" ? "public" : "private";
-    setJournalData({ ...journalData, visibility: newVisibility });
-    alert(`Journal is now ${newVisibility}.`);
   };
 
   if (loading) {
@@ -148,10 +153,20 @@ const DetailedJournal = () => {
         </Button>
         {isPrivate && (
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={handleEdit}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<EditIcon />}
+              onClick={handleEdit}
+            >
               Edit
             </Button>
-            <Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={handleDelete}>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              onClick={handleDelete}
+            >
               Delete
             </Button>
             <Button
@@ -179,7 +194,7 @@ const DetailedJournal = () => {
         }}
       >
         <img
-          src={journalData.image}
+          src={journalData.image || "https://via.placeholder.com/800x300"}
           alt={journalData.title}
           style={{
             width: "100%",
@@ -222,13 +237,15 @@ const DetailedJournal = () => {
       >
         <Avatar
           sx={{ width: 60, height: 60, marginRight: 2 }}
-          src={journalData.user?.avatar}
+          src={journalData.user?.avatar || "https://via.placeholder.com/150"}
         />
         <Typography variant="body1">
-          Written by <strong>{journalData.user?.name}</strong>
-          <Typography variant="body2" sx={{ color: "gray", marginTop: 0.5 }}>
-            {journalData.user?.email}
-          </Typography>
+          Written by <strong>{journalData.user?.name || "Anonymous"}</strong>
+          {journalData.user?.email && (
+            <Typography variant="body2" sx={{ color: "gray", marginTop: 0.5 }}>
+              {journalData.user.email}
+            </Typography>
+          )}
         </Typography>
       </Box>
 

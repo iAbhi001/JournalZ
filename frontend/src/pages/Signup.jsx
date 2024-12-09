@@ -1,7 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Button, TextField, Typography, Link, Alert, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../AuthContext";
+import API from "../api/axios"; // Import Axios instance
 
 const Signup = () => {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
   // Form state and error handling
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,22 +18,37 @@ const Signup = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = () => {
-    setError("");
-    setSuccess("");
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSignup = async () => {
+    setError(""); // Reset error
+    setSuccess(""); // Reset success message
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    setLoading(true);
-
-    // Simulate a successful signup
-    setTimeout(() => {
-      setSuccess("Signup successful! This is a UI-only demo.");
-      setLoading(false);
-    }, 2000);
+    setLoading(true); // Start loading
+    try {
+      const response = await API.post("/users/register", {
+        name,
+        email,
+        password,
+        role, // Include role in the request
+      });
+      setSuccess("Account created successfully! Redirecting to login...");
+      setTimeout(() => navigate("/login"), 3000); // Redirect to login after 3 seconds
+    } catch (err) {
+      setError(err.response?.data?.message || "Signup failed. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading
+    }
   };
 
   return (

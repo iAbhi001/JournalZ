@@ -12,13 +12,14 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import API from "../api/axios";
 
 const MyJournals = () => {
   const navigate = useNavigate();
 
   const [journals, setJournals] = useState([]);
-  const [tags, setTags] = useState(["Personal", "Travel", "Work"]);
-  const [years, setYears] = useState([2023, 2022, 2021]);
+  const [tags, setTags] = useState([]);
+  const [years, setYears] = useState([]);
   const [months] = useState([
     "January",
     "February",
@@ -38,52 +39,83 @@ const MyJournals = () => {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(3); // Simulated total pages
+  const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const journalsPerPage = 6;
 
-  // Simulate fetching journals
-  useEffect(() => {
+  const fetchJournals = async (currentPage = 1) => {
     setLoading(true);
     setError("");
+    try {
+      const { data } = await API.get("/journals", {
+        params: {
+          page: currentPage,
+          limit: journalsPerPage,
+          tag: selectedTag,
+          year: selectedYear,
+          month: selectedMonth,
+        },
+      });
+      setJournals(data.journals);
+      setTotalPages(data.totalPages);
 
-    setTimeout(() => {
-      const sampleJournals = Array.from({ length: journalsPerPage }, (_, i) => ({
-        _id: i + (page - 1) * journalsPerPage,
-        title: `Journal Title ${i + 1}`,
-        tags: ["Personal", "Travel"],
-        visibility: i % 2 === 0 ? "private" : "public",
-        image: "https://via.placeholder.com/150",
-      }));
-      setJournals(sampleJournals);
+      const allYears = Array.from(
+        new Set(data.journals.map((journal) => new Date(journal.createdAt).getFullYear()))
+      );
+      setYears(allYears);
+
+      const allTags = data.journals.flatMap((journal) => journal.tags || []);
+      setTags([...new Set(allTags)]);
+    } catch (error) {
+      setError("Failed to fetch journals. Please try again.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    fetchJournals(page);
   }, [page, selectedTag, selectedYear, selectedMonth]);
+
+  const handleVisibilityToggle = async (id, currentVisibility) => {
+    const newVisibility = currentVisibility === "private" ? "public" : "private";
+    try {
+      await API.patch(`/journals/${id}/visibility`, {
+        visibility: newVisibility,
+      });
+      setJournals((prevJournals) =>
+        prevJournals.map((journal) =>
+          journal._id === id ? { ...journal, visibility: newVisibility } : journal
+        )
+      );
+    } catch (error) {
+      alert("Failed to update visibility.");
+    }
+  };
 
   const handleEdit = (id) => {
     navigate(`/edit-journal/${id}`);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this journal?")) {
-      setJournals((prev) => prev.filter((journal) => journal._id !== id));
-      alert("Journal deleted successfully.");
+      try {
+        await API.delete(`/journals/${id}`);
+        setJournals(journals.filter((journal) => journal._id !== id));
+        alert("Journal deleted successfully.");
+      } catch (error) {
+        alert("Failed to delete journal.");
+      }
     }
-  };
-
-  const handleVisibilityToggle = (id, currentVisibility) => {
-    const newVisibility = currentVisibility === "private" ? "public" : "private";
-    setJournals((prev) =>
-      prev.map((journal) =>
-        journal._id === id ? { ...journal, visibility: newVisibility } : journal
-      )
-    );
   };
 
   const handleCreateNewJournal = () => {
     navigate("/create-journal");
+  };
+  const handleClick = (id) => {
+    navigate(`/journal/${id}`);
   };
 
   return (
@@ -195,14 +227,8 @@ const MyJournals = () => {
       ) : (
         <Grid container spacing={4}>
           {journals.map((journal) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              key={journal._id}
-              style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/journal/${journal._id}`)}
+            <Grid item xs={12} sm={6} md={4} key={journal._id} onClick={() => navigate(`/journal/${journal._id}`)} 
+            style={{ cursor: "pointer" }}
             >
               <Card
                 sx={{
@@ -216,7 +242,7 @@ const MyJournals = () => {
               >
                 <Box
                   sx={{
-                    backgroundImage: `url(${journal.image})`,
+                    backgroundImage: `url(${journal.image || "https://via.placeholder.com/150"})`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     height: 150,
