@@ -16,7 +16,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { useNavigate, useParams } from "react-router-dom";
-import Comments from "../../components/Comments";
+import Comments from "../components/Comments";
 
 const DetailedJournal = () => {
   const navigate = useNavigate();
