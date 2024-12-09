@@ -62,6 +62,8 @@ const ForgotPassword = () => {
           fullWidth
           label="Email Address"
           variant="outlined"
+          placeholder="Email"
+          type="email"
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

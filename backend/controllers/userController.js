@@ -166,6 +166,13 @@ const getStreak = async (req, res) => {
 // Forgot Password Controller
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
+  // Email validation regex
+  const validEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  // Check if email is valid
+  if (!validEmailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format." });
+  }
 
   try {
     const user = await User.findOne({ email });

@@ -5,6 +5,8 @@ const { errorHandler, notFound } = require("./middleware/errorMiddleware");
 const cors = require('cors')
 const logger = require("./utils/logger");
 const userRoutes = require("./routes/userRoutes");
+const journalRoutes = require("./routes/journalRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 dotenv.config();
 connectDB();
@@ -21,6 +23,8 @@ app.use((req, res, next) => {
 
 // Routes
 app.use("/api/users", userRoutes);
+app.use("/api/journals", journalRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Error Handling Middleware
 app.use(notFound);
