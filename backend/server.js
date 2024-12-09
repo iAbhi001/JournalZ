@@ -21,7 +21,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:5173", "https://journalz.onrender.com"], // Allow specific origins
+  origin: ["http://localhost:5173", "https://journalz.onrender.com","https://journalifyz.netlify.app"], // Allow specific origins
   methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
   credentials: true, // Allow credentials like cookies
 }));
