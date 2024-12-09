@@ -22,7 +22,7 @@ const app = express();
 app.use(express.json());
 app.use(cors({
   origin: ["http://localhost:5173", "https://journalz.onrender.com","https://journalifyz.netlify.app"], // Allow specific origins
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allow specific HTTP methods
+  methods: ["GET", "POST", "PUT", "DELETE"m "PATCH"], // Allow specific HTTP methods
   credentials: true, // Allow credentials like cookies
 }));
 // Request logging middleware
