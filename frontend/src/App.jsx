@@ -5,6 +5,11 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ProtectedRoutes from "./components/ProtectedRoutes";
+import Profile from "./pages/Profile";
+import PublicJournals from "./pages/PublicJournals";
+import MyJournals from "./pages/MyJournals";
+import Dashboard from "./pages/Dashboard";
 
 const App = () => {
 
@@ -17,6 +22,18 @@ const App = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoutes />}>
+        <Route
+            path="/dashboard"
+            element={  <Dashboard />}
+          />
+        <Route path="/public-journals" element={<PublicJournals />} />
+        <Route path="/my-journals" element={<MyJournals />} />
+        <Route path="/profile" element={<Profile />} />
+        
+        </Route>
 
         {/* Catch-All Route */}
         <Route path="*" element={<Navigate to="/" />} />
