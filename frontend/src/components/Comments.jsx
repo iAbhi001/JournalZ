@@ -1,40 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Typography, Button, TextField, CircularProgress, Alert } from "@mui/material";
+import API from "../api/axios";
+import EditComment from "./EditComment";
+import DeleteComment from "./DeleteComment";
 
 const Comments = ({ journalId, journalOwnerId, currentUserId }) => {
-  const [comments, setComments] = useState([
-    {
-      _id: "1",
-      content: "This is a great journal entry!",
-      user: { _id: "123", name: "John Doe" },
-      createdAt: new Date().toISOString(),
-    },
-    {
-      _id: "2",
-      content: "I completely agree with your thoughts.",
-      user: { _id: "456", name: "Jane Smith" },
-      createdAt: new Date().toISOString(),
-    },
-  ]); // Simulated comments
+  const [comments, setComments] = useState([]); // Initialize as an array
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
+  // Fetch comments for the journal
+  useEffect(() => {
+    const fetchComments = async () => {
+      setLoading(true);
+      try {
+        const { data } = await API.get(`/journals/${journalId}/comments`);
+        setComments(data.comments); // Extract `comments` from API response
+      } catch (err) {
+        setError("Failed to load comments.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchComments();
+  }, [journalId]);
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) return;
     setLoading(true);
-    setTimeout(() => {
-      const newCommentData = {
-        _id: Date.now().toString(),
-        content: newComment,
-        user: { _id: currentUserId, name: "You" },
-        createdAt: new Date().toISOString(),
-      };
-      setComments((prev) => [...prev, newCommentData]); // Append the new comment
+    try {
+      const { data } = await API.post(`/journals/${journalId}/comments`, { journalId, content: newComment });
+      setComments((prev) => [...prev, data]); // Append the new comment
       setNewComment(""); // Reset input
+    } catch (err) {
+      setError("Failed to add comment.");
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleEditSave = (updatedComment) => {
@@ -91,26 +95,15 @@ const Comments = ({ journalId, journalOwnerId, currentUserId }) => {
 
           {/* Edit and Delete Buttons */}
           {(comment.user._id === currentUserId || journalOwnerId === currentUserId) && (
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button
-                variant="text"
-                onClick={() =>
-                  handleEditSave({
-                    ...comment,
-                    content: `${comment.content} (Edited)`,
-                  })
-                }
-              >
-                Edit
-              </Button>
-              <Button
-                variant="text"
-                color="error"
-                onClick={() => handleDeleteComment(comment._id)}
-              >
-                Delete
-              </Button>
-            </Box>
+            <>
+              <EditComment comment={comment} onSave={handleEditSave} />
+              <DeleteComment
+                comment={comment}
+                journalOwnerId={journalOwnerId}
+                currentUserId={currentUserId}
+                onDelete={handleDeleteComment}
+              />
+            </>
           )}
         </Box>
       ))}

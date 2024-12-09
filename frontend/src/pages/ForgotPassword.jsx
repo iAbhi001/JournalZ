@@ -1,36 +1,24 @@
 import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Box, Button, TextField, Typography, Alert } from "@mui/material";
+import { Box, Button, TextField, Typography, Link, Alert } from "@mui/material";
 import API from "../api/axios";
 
-const ResetPassword = () => {
-  const { token } = useParams(); // Get the reset token from the URL
-  const navigate = useNavigate();
-
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+const ForgotPassword = () => {
+  const [email, setEmail] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleResetPassword = async () => {
+  const handleForgotPassword = async () => {
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
 
-    if (newPassword !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { data } = await API.post("/users/reset-password", { token, newPassword });
+      const { data } = await API.post("/users/forgot-password", { email });
       setSuccessMessage(data.message);
-      setTimeout(() => navigate("/login"), 3000); // Redirect to login after success
     } catch (error) {
       setErrorMessage(
-        error.response?.data?.message || "Failed to reset password."
+        error.response?.data?.message || "Failed to send reset link."
       );
     } finally {
       setLoading(false);
@@ -45,7 +33,7 @@ const ResetPassword = () => {
         alignItems: "center",
         justifyContent: "center",
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%)",
+        background: "linear-gradient(135deg, #5d9cec 0%, #4a5bdc 100%)",
         color: "#fff",
         padding: 4,
       }}
@@ -61,10 +49,10 @@ const ResetPassword = () => {
         }}
       >
         <Typography variant="h4" fontWeight="bold" color="primary" gutterBottom>
-          Reset Password
+          Forgot Password
         </Typography>
         <Typography variant="body1" color="textSecondary" mb={2}>
-          Enter your new password to reset it.
+          Enter your email address, and we'll send you a link to reset your password.
         </Typography>
 
         {successMessage && <Alert severity="success">{successMessage}</Alert>}
@@ -72,24 +60,11 @@ const ResetPassword = () => {
 
         <TextField
           fullWidth
-          label="New Password"
-          type="password"
+          label="Email Address"
           variant="outlined"
           margin="normal"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          InputProps={{
-            style: { background: "#f5f5f5", borderRadius: "8px" },
-          }}
-        />
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          type="password"
-          variant="outlined"
-          margin="normal"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           InputProps={{
             style: { background: "#f5f5f5", borderRadius: "8px" },
           }}
@@ -97,21 +72,26 @@ const ResetPassword = () => {
         <Button
           fullWidth
           variant="contained"
-          onClick={handleResetPassword}
+          onClick={handleForgotPassword}
           disabled={loading}
           sx={{
             mt: 3,
             py: 1.5,
             borderRadius: "8px",
-            backgroundColor: "#ff758c",
-            "&:hover": { backgroundColor: "#ff7eb3" },
+            backgroundColor: "#5d9cec",
+            "&:hover": { backgroundColor: "#4a5bdc" },
           }}
         >
-          {loading ? "Resetting..." : "Reset Password"}
+          {loading ? "Sending..." : "Send Reset Link"}
         </Button>
+        <Box sx={{ mt: 2 }}>
+          <Link href="/login" underline="hover" color="secondary">
+            Back to Login
+          </Link>
+        </Box>
       </Box>
     </Box>
   );
 };
 
-export default ResetPassword;
+export default ForgotPassword;

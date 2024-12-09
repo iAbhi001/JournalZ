@@ -16,12 +16,15 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
+import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const SideNav = () => {
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    logout();
     navigate("/login");
   };
 

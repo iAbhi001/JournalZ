@@ -13,6 +13,7 @@ import {
   Chip,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
+import API from "../api/axios"; // Axios instance for API calls
 
 const EditJournal = () => {
   const navigate = useNavigate();
@@ -23,30 +24,29 @@ const EditJournal = () => {
     category: "",
     content: "",
     image: "",
-    tags: [],
+    tags: [], // Add tags field
   });
 
-  const [tagInput, setTagInput] = useState("");
+  const [tagInput, setTagInput] = useState(""); // For adding new tags
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
 
-  // Simulate fetching existing journal data
+  // Fetch existing journal data
   useEffect(() => {
-    setFetching(true);
-
-    setTimeout(() => {
-      const simulatedData = {
-        title: "My Sample Journal",
-        category: "Personal",
-        content: "This is a sample content for the journal.",
-        image: "https://via.placeholder.com/150",
-        tags: ["Sample", "React", "Journal"],
-      };
-      setJournalData(simulatedData);
-      setFetching(false);
-    }, 1000);
+    const fetchJournal = async () => {
+      try {
+        const { data } = await API.get(`/journals/${id}`);
+        setJournalData(data);
+      } catch (err) {
+        console.error("Error fetching journal:", err);
+        setError("Failed to fetch journal data.");
+      } finally {
+        setFetching(false);
+      }
+    };
+    fetchJournal();
   }, [id]);
 
   const handleChange = (e) => {
@@ -54,6 +54,7 @@ const EditJournal = () => {
     setJournalData({ ...journalData, [name]: value });
   };
 
+  // Handle adding a new tag
   const handleAddTag = () => {
     if (tagInput.trim() && !journalData.tags.includes(tagInput.trim())) {
       setJournalData({ ...journalData, tags: [...journalData.tags, tagInput.trim()] });
@@ -61,6 +62,7 @@ const EditJournal = () => {
     }
   };
 
+  // Handle removing a tag
   const handleRemoveTag = (tagToRemove) => {
     setJournalData({
       ...journalData,
@@ -68,23 +70,19 @@ const EditJournal = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setError("");
     setSuccess("");
     setLoading(true);
-
-    setTimeout(() => {
-      if (!journalData.title || !journalData.content) {
-        setError("Title and Content are required.");
-        setLoading(false);
-        return;
-      }
-
+    try {
+      await API.put(`/journals/${id}`, journalData); // Make API call to update the journal
       setSuccess("Journal updated successfully!");
+      setTimeout(() => navigate("/my-journals"), 2000); // Redirect after 2 seconds
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update journal.");
+    } finally {
       setLoading(false);
-
-      setTimeout(() => navigate("/my-journals"), 2000);
-    }, 1000);
+    }
   };
 
   return (
