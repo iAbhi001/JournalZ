@@ -113,6 +113,7 @@ const Signup = () => {
         <TextField
           fullWidth
           label="Name"
+          placeholder="Name"
           variant="outlined"
           margin="normal"
           InputProps={{
@@ -124,6 +125,7 @@ const Signup = () => {
         <TextField
           fullWidth
           label="Email"
+          placeholder="Email"
           variant="outlined"
           margin="normal"
           InputProps={{
@@ -135,6 +137,7 @@ const Signup = () => {
         <TextField
           fullWidth
           label="Password"
+          placeholder="Password"
           type="password"
           variant="outlined"
           margin="normal"
@@ -147,6 +150,7 @@ const Signup = () => {
         <TextField
           fullWidth
           label="Confirm Password"
+          placeholder="Confirm Password"
           type="password"
           variant="outlined"
           margin="normal"

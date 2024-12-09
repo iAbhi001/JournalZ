@@ -92,6 +92,7 @@ const Login = () => {
           label="Email"
           variant="outlined"
           margin="normal"
+          placeholder="Email"
           InputProps={{
             style: { background: "#f5f5f5", borderRadius: "8px" },
           }}
@@ -102,6 +103,7 @@ const Login = () => {
           fullWidth
           label="Password"
           type="password"
+          placeholder="Password"
           variant="outlined"
           margin="normal"
           InputProps={{

@@ -248,8 +248,8 @@ const MyJournals = () => {
                     height: 150,
                   }}
                 />
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                <CardContent className="journal-card">
+                  <Typography variant="h6" fontWeight="bold" gutterBottom className="journal-title">
                     {journal.title}
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1 }}>
