@@ -17,7 +17,13 @@ const ResetPassword = () => {
     setLoading(true);
     setSuccessMessage("");
     setErrorMessage("");
-
+  
+    if (!newPassword || !confirmPassword) {
+      setErrorMessage("Passwords cannot be empty.");
+      setLoading(false);
+      return;
+    }
+  
     if (newPassword !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
       setLoading(false);
@@ -36,6 +42,7 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
+  
 
   return (
     <Box
@@ -73,6 +80,7 @@ const ResetPassword = () => {
         <TextField
           fullWidth
           label="New Password"
+          placeholder='New Password'
           type="password"
           variant="outlined"
           margin="normal"
@@ -85,6 +93,7 @@ const ResetPassword = () => {
         <TextField
           fullWidth
           label="Confirm Password"
+          placeholder="Confirm Password"
           type="password"
           variant="outlined"
           margin="normal"

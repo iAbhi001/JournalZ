@@ -217,6 +217,7 @@ const PublicJournals = () => {
             style={{ cursor: "pointer" }}
             >
               <Card
+              className="journal-card"
                 sx={{
                   borderRadius: 3,
                   boxShadow: 3,
@@ -235,7 +236,7 @@ const PublicJournals = () => {
                   }}
                 />
                 <CardContent>
-                  <Typography variant="h6" gutterBottom>
+                  <Typography variant="h6" gutterBottom className="journal-title">
                     {journal.title}
                   </Typography>
                   <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -244,6 +245,7 @@ const PublicJournals = () => {
                         key={index}
                         label={tag}
                         size="small"
+                        
                         sx={{
                           backgroundColor: "#6a11cb",
                           color: "#fff",
