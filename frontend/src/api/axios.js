@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api", // Replace with your backend's base URL
+  baseURL: "https://journalz.onrender.com/api", // Replace with your backend's base URL
 });
 
 // Attach Authorization token from cookies to every request
