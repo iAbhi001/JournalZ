@@ -82,7 +82,9 @@ const deleteJournal = async (req, res) => {
       return res.status(404).json({ message: "Journal not found." });
     }
 
-    await journal.remove();
+    // Delete the journal
+    await Journal.deleteOne({ _id: id }); // Alternative to journal.remove()
+
     res.json({ message: "Journal deleted successfully." });
   } catch (error) {
     console.error("Error deleting journal:", error.message);
