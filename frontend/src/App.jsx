@@ -10,6 +10,8 @@ import Profile from "./pages/Profile";
 import PublicJournals from "./pages/PublicJournals";
 import MyJournals from "./pages/MyJournals";
 import Dashboard from "./pages/Dashboard";
+import CreateJournal from "./pages/CreateJournal";
+import EditJournal from "./pages/EditJournal";
 
 const App = () => {
 
@@ -32,7 +34,9 @@ const App = () => {
         <Route path="/public-journals" element={<PublicJournals />} />
         <Route path="/my-journals" element={<MyJournals />} />
         <Route path="/profile" element={<Profile />} />
-        
+        <Route path="/create-journal" element={<CreateJournal />} />
+        <Route path="/edit-journal/:id" element={<EditJournal />} />
+     
         </Route>
 
         {/* Catch-All Route */}
