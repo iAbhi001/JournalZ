@@ -29,7 +29,7 @@ const ResetPassword = () => {
       setLoading(false);
       return;
     }
-  
+
     try {
       const { data } = await API.post("/users/reset-password", { token, newPassword });
       setSuccessMessage(data.message);
