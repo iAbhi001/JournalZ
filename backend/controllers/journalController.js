@@ -126,20 +126,25 @@ const updateJournal = async (req, res) => {
     }
   };
   
-
+// Delete a journal
 const deleteJournal = async (req, res) => {
-  try {
-    const journal = await Journal.findById(req.params.id);
-    if (!journal) throw new Error("Journal not found");
+  const { id } = req.params;
 
-    if (journal.user.toString() !== req.user.id) {
-      return res.status(401).json({ message: "Not authorized" });
+  try {
+    const journal = await Journal.findById(id);
+    console.log(journal)
+
+    if (!journal) {
+      return res.status(404).json({ message: "Journal not found." });
     }
 
-    await journal.remove();
-    res.json({ message: "Journal removed" });
+    // Delete the journal
+    await Journal.deleteOne({ _id: id }); // Alternative to journal.remove()
+
+    res.json({ message: "Journal deleted successfully." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error deleting journal:", error.message);
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 
