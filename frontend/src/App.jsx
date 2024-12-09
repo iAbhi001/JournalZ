@@ -13,7 +13,7 @@ import DetailedJournal from "./pages/DetailedJournal";
 import CreateJournal from "./pages/CreateJournal";
 import EditJournal from "./pages/EditJournal";
 import ProtectedRoutes from "./components/ProtectedRoutes";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/adminDashboard";
 import ManageUsers from "./components/ManageUsers";
 import ManageJournals from "./components/ManageJournals";
 import AdminDetailedJournal from "./pages/AdminDetailedJournal";
