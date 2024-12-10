@@ -48,7 +48,7 @@ const SideNav = () => {
       {/* App Header */}
       <Box sx={{ textAlign: "center", marginBottom: 4 }}>
         <Typography variant="h5" fontWeight="bold">
-          Journaling App
+          Journalify
         </Typography>
         <Typography variant="body2" sx={{ opacity: 0.7 }}>
           Navigate your journey
