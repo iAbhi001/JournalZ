@@ -11,7 +11,7 @@ describe("Forgot Password Page", () => {
     });
   
     it("sends a reset link for a valid registered email", () => {
-      const registeredEmail = "user1733735189122@example.com"; // Replace with a valid test email
+      const registeredEmail = "ram@email.com"; // Replace with a valid test email
       cy.get("input[placeholder='Email']").type(registeredEmail);
       cy.get("button").contains("Send Reset Link").click();
   
