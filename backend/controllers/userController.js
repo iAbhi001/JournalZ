@@ -186,7 +186,7 @@ const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
     await user.save();
 
-    const resetLink = `${req.protocol}://localhost:5173/reset-password/${resetToken}`;
+    const resetLink = `https://journalifyz.netlify.app/reset-password/${resetToken}`;
 
     // Send reset email
     await sendEmail(
