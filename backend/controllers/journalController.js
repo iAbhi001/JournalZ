@@ -89,18 +89,24 @@ const createJournal = async (req, res) => {
   };
   
   
+
 const getJournalById = async (req, res) => {
-  try {
-    // Fetch journal with user details
-    const journal = await Journal.findById(req.params.id).populate("user", "name email avatar");
-    if (!journal) {
-      return res.status(404).json({ message: "Journal not found" });
+    try {
+      const journal = await Journal.findById(req.params.id).populate("user", "name email avatar");
+      if (!journal) {
+        return res.status(404).json({ message: "Journal not found" });
+      }
+  
+      // Check if the journal is private and the user is not the owner
+      if (journal.visibility === "private" && (!req.user || journal.user._id.toString() !== req.user.id)) {
+        return res.status(403).json({ message: "Access denied. This journal is private." });
+      }
+  
+      res.json(journal);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-    res.json(journal);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  };
 
 const updateJournal = async (req, res) => {
     const { title, category, tags, content, image } = req.body;
