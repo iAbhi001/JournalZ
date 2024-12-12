@@ -41,25 +41,24 @@ const DetailedJournal = () => {
       alert("Failed to update visibility. Please try again.");
     }
   };
-
   useEffect(() => {
     const fetchJournal = async () => {
       try {
         const { data } = await API.get(`/journals/${id}`);
         setJournalData(data);
-
-        // Determine if the journal is private
-        if (data.user && data.user._id === loggedInUserId) {
-          setIsPrivate(true);
-        }
       } catch (err) {
-        setError("Failed to fetch journal details.");
+        if (err.response && err.response.status === 403) {
+          setError("This is a Private Journal. You are not authorized to view this journal. ");
+        } else {
+          setError("Failed to fetch journal details.");
+        }
       } finally {
         setLoading(false);
       }
     };
     fetchJournal();
-  }, [id, loggedInUserId]);
+  }, [id]);
+  
 
   const handleBack = () => {
     navigate(-1);
