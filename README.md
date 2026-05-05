@@ -9,13 +9,13 @@ Journalify is a journaling application that allows users to create, edit, and ma
 - Testing: Cypress (Frontend), Jest and Supertest (Backend)
 - Database: MongoDB
 - Authentication: JWT, Cookies
-- Styling: Material-UI (MUI)
+- Styling: Material-UI (MUI) 
 
 ### Prerequisites
 Make sure you have the following installed on your system:
 
 - Node.js (v16 or above)
-- npm (comes with Node.js) or Yarn
+- npm (comes with Node.js) or Yarn              
 - MongoDB (local instance or cloud database)
 - Git (optional, for cloning the repository)
 
